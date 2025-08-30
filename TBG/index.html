@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TFI Banisa Quiz</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: black;
+      color: white;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    /* Curtain Scene */
+    #curtain-scene {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background: url("curtains.png") no-repeat center center;
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      animation: openCurtains 4s forwards;
+      z-index: 10;
+    }
+
+    @keyframes openCurtains {
+      0% { clip-path: inset(0 0 0 0); }
+      100% { clip-path: inset(0 50% 0 50%); }
+    }
+
+    #welcome-text {
+      font-size: 2rem;
+      animation: fadeIn 3s ease-in-out forwards;
+      opacity: 0;
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* Game Scene */
+    #game-container {
+      display: none;
+      background: url("cinema-hall.png") no-repeat center center;
+      background-size: cover;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #question-box {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      border-radius: 15px;
+      width: 70%;
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 8px;
+      border: none;
+      margin: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 10px;
+      background: crimson;
+      color: white;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .correct {
+      background-color: rgba(0, 255, 0, 0.5);
+      animation: flashGreen 1s;
+    }
+
+    .wrong {
+      background-color: rgba(255, 0, 0, 0.5);
+      animation: flashRed 1s;
+    }
+
+    @keyframes flashGreen {
+      0% { background-color: rgba(0,255,0,0.8); }
+      100% { background-color: transparent; }
+    }
+    @keyframes flashRed {
+      0% { background-color: rgba(255,0,0,0.8); }
+      100% { background-color: transparent; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Curtain Scene -->
+  <div id="curtain-scene">
+    <h1 id="welcome-text">🎬 Swagatham Suswagatham 🎬</h1>
+  </div>
+
+  <!-- Game Scene -->
+  <div id="game-container">
+    <div id="name-screen">
+      <h2>Enter Your Name:</h2>
+      <input type="text" id="player-name" placeholder="Your Name">
+      <br>
+      <button onclick="startGame()">Start Game</button>
+    </div>
+
+    <div id="quiz-screen" style="display:none;">
+      <div id="question-box"></div>
+      <input type="text" id="answer" placeholder="Type your answer here">
+      <br>
+      <button onclick="submitAnswer()">Submit</button>
+    </div>
+  </div>
+
+  <!-- Audio Effects -->
+  <audio id="correct-sound" src="correct.mp3"></audio>
+  <audio id="wrong-sound" src="wrong.mp3"></audio>
+
+  <script>
+    // Questions Array
+    const questions = [
+      { q: "This movie has the dialogue: 'Taggede le' 🎭", a: "Pushpa" },
+      { q: "This movie has Mahesh Babu saying: 'Nenu oka matram cheppanu' 🎬", a: "Pokiri" },
+      { q: "This movie name is also a flower 🌸", a: "Malleeshwari" },
+      { q: "This movie features the dialogue: 'Okkadu migiladu' ⚔️", a: "Okkadu" },
+      { q: "This movie is based on Komaram Bheem ⚡", a: "RRR" },
+      { q: "Rajinikanth as Robot 🤖", a: "Robo" },
+      { q: "Balayya dialogue: 'Jai Balayya' 🔥", a: "Legend" },
+      { q: "Chiranjeevi’s 150th movie 🎥", a: "Khaidi No 150" },
+      { q: "Dialog: 'Vennupotu kaadu brother' 👊", a: "Arjun Reddy" },
+      { q: "Prabhas as Baahubali 🗡️", a: "Baahubali" }
+    ];
+
+    let currentQuestion = 0;
+
+    // Remove curtain after animation
+    setTimeout(() => {
+      document.getElementById("curtain-scene").style.display = "none";
+      document.getElementById("game-container").style.display = "flex";
+    }, 5000);
+
+    function startGame() {
+      const player = document.getElementById("player-name").value.trim();
+      if (player === "") {
+        alert("Please enter your name!");
+        return;
+      }
+      document.getElementById("name-screen").style.display = "none";
+      document.getElementById("quiz-screen").style.display = "block";
+      loadQuestion();
+    }
+
+    function loadQuestion() {
+      if (currentQuestion < questions.length) {
+        document.getElementById("question-box").innerText = questions[currentQuestion].q;
+        document.getElementById("answer").value = "";
+      } else {
+        document.getElementById("quiz-screen").innerHTML = `<h2>🎉 Congratulations! You are now a TFI Banisa! 🎉</h2>`;
+      }
+    }
+
+    function submitAnswer() {
+      const ans = document.getElementById("answer").value.trim().toLowerCase();
+      const correct = questions[currentQuestion].a.toLowerCase();
+
+      if (ans === correct) {
+        document.getElementById("quiz-screen").classList.add("correct");
+        document.getElementById("correct-sound").play();
+      } else {
+        document.getElementById("quiz-screen").classList.add("wrong");
+        document.getElementById("wrong-sound").play();
+      }
+
+      setTimeout(() => {
+        document.getElementById("quiz-screen").classList.remove("correct", "wrong");
+        currentQuestion++;
+        loadQuestion();
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
